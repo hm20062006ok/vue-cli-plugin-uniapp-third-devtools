@@ -1,0 +1,17 @@
+{
+  "name": "vue-cli-plugin-uniapp-third-devtools",
+  "version": "1.0.1",
+  "description": "An Vue-cli plugin for open third devtools for uni-app cli project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "idea",
+    "vscode",
+    "vue",
+    "uni-app"
+  ],
+  "author": "MiaoHu",
+  "license": "MIT"
+}
