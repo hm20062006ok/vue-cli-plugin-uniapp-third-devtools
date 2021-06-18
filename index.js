@@ -1,27 +1,102 @@
+const path = require('path');
+const { platform } = process;
+const { spawn } = require('child_process');
+
+
+//todo 其他平台的cli 方式
+const buildPlatforms = {
+    'app-plus': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    },
+    'mp-360': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    },
+    'mp-alipay': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    },
+    'mp-baidu': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    },
+    'mp-alipay': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    },
+    'mp-qq': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    },
+    'mp-weixin': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    },
+    'mp-alipay': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    },
+    'quickapp-native': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    },
+    'quickapp-webview': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    },
+    'quickapp-webview-huawei': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    },
+    'quickapp-webview-union': {
+        win32Command: '\\cli.bat',
+        darwinCommand: '/cli'
+    }
+}
+
 /**
  *  打开开发者工具
- * @param platform
- * @param outputDir
- * @param thirdDevToolsConfig
+ * @param outputDir 编译输出目录
+ * @param thirdDevToolsConfig 配置
  */
-function openThirdDevTools(platform, outputDir, thirdDevToolsConfig) {
+
+function openThirdDevTools(outputDir, thirdDevToolsConfig) {
+
+    const currntBuildPlatform = process.env.UNI_PLATFORM
+
     if (thirdDevToolsConfig.length < 0) {
-        console.error('未配置可执行文件路径')
-        return
+        console.error('未配置插件参数：thirdDevToolsConfig')
+        retrun
     }
-    thirdDevToolsConfig.find((config) => {
-        if (config.platform === platform) {
-            const command = config.execPath + config.command + outputDir
-            const execSync = require('child_process').execSync;
-            execSync(command);
-            console.log('开发工具者工具已经打开');
+
+    thirdDevToolsConfig.find((item) => {
+        if (item.execPath === undefined) {
+            console.error('未配置当前平台：' + currntBuildPlatform + ' 可执行文件路径: execPath')
+            return
+        }
+        if (item.targetBuildPlatform === currntBuildPlatform) {
+            if (platform == 'win32') {
+
+                const command = '"' +item.execPath+buildPlatforms[currntBuildPlatform].win32Command+'"'
+                const outputDirLocal = "\"" + outputDir.replace(/'/g, '"') +"\""
+                var ls = spawn(command, ['open', '--project', outputDirLocal ],{shell: true});
+                ls = null;
+            } else if (platform == 'darwin') {
+
+                const command = item.execPath + buildPlatforms[currntBuildPlatform].darwinCommand
+                var ls = spawn(command, ['open', '--project', outputDir ],{shell: true});
+                ls = null;
+            }//else{
+            //  TODO others os paltform
+            //     console.error('third-devTools: ','not supported os platform')
+            // }
         }
     })
+
 }
 
 module.exports = (api, options) => {
-
-    let platform = process.env.UNI_PLATFORM
     let ouputDir = options.outputDir
     let thirdDevToolsConfig = options.pluginOptions.thirdDevToolsConfig
 
@@ -29,7 +104,7 @@ module.exports = (api, options) => {
     const buildFn = build.fn;
     build.fn = (...args) => {
         return buildFn(...args).then(() => {
-            openThirdDevTools(platform, ouputDir, thirdDevToolsConfig)
+            openThirdDevTools(ouputDir, thirdDevToolsConfig)
         })
     }
 }
